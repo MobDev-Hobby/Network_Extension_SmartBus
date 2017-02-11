@@ -8,7 +8,6 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
-import nes.pkg.PackageLightStatus;
 
 /**
  *
@@ -17,7 +16,7 @@ import nes.pkg.PackageLightStatus;
 public class HttpServerController extends Thread
 {
     
-    private int port;
+    private final int port;
     volatile Object mutex = new Object();
                
     public HttpServerController(int port)

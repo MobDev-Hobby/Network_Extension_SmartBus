@@ -4,14 +4,10 @@
  */
 package nes;
 
-import java.awt.AWTException;
-import java.awt.Robot;
+import nes.pkg.SmartBusHDLPackage;
 import java.io.IOException;
 import java.net.*;
-import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

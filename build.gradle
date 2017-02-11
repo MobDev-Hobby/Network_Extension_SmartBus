@@ -1,0 +1,27 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+jar {
+    baseName = "NES"
+}
+
+task run(type:JavaExec) {
+    main = 'nes/NES'
+    classpath sourceSets.main.runtimeClasspath
+    workingDir = 'scripts'
+}

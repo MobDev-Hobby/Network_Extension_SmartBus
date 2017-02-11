@@ -2,12 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package nes;
+package nes.pkg;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -31,7 +29,12 @@ public class SmartBusHDLPackage {
     {
         
     }
-            
+          
+    public boolean isInstance()
+    {
+        return true;       
+    }
+        
     public Integer getOperation()
     {
         return (this.hdl_operation[0]<<8)+this.hdl_operation[1];
@@ -135,8 +138,7 @@ public class SmartBusHDLPackage {
             return this;
         }
         this.hdl_arg = new byte[value.length];
-        for(int i=0; i<this.hdl_arg.length;i++)
-            this.hdl_arg[i] = value[i];
+        System.arraycopy(value, 0, this.hdl_arg, 0, this.hdl_arg.length);
         return this;
     }
     
@@ -256,7 +258,8 @@ public class SmartBusHDLPackage {
     public void putCRC(byte[] data) 
         {
             int crc = 0;
-            int dat = 0;
+            int dat;
+            
             for (int i = 16; i < data.length - 2; i++) 
             {
                 dat = (int)(0xFF&(crc >> 8));

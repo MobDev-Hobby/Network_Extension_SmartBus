@@ -4,6 +4,7 @@
  */
 package nes;
 
+import nes.pkg.SmartBusHDLPackage;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.*;
@@ -98,15 +99,13 @@ public class HttpServerHandler implements HttpHandler{
             // Parse agrs
             HashMap<String,String> args = new HashMap();
             HashMap<String,byte[]> byte_args = new HashMap();
-            for(int i = 0; i < params.length; i++ )
-            {
-                if(params[i].contains("="))
-                {
-                    if(!params[i].contains("="))
+            for (String param : params) {
+                if (param.contains("=")) {
+                    if (!param.contains("=")) {
                         continue;
-                    String arg = params[i].split("=")[0];
-                    String value = params[i].split("=")[1];
-
+                    }
+                    String arg = param.split("=")[0];
+                    String value = param.split("=")[1];
                     if(value.startsWith("0x"))
                     {    
                         try
@@ -114,7 +113,7 @@ public class HttpServerHandler implements HttpHandler{
                             byte[] g = new byte[value.length()/2-1];
                             for(int z = 2; z < value.length(); z+=2)
                             {
-                                g[z/2-1] = (byte)Integer.parseInt(value.substring(z,z+2),16);                      
+                                g[z/2-1] = (byte)Integer.parseInt(value.substring(z,z+2),16);
                             }   
                             byte_args.put(arg, g);
                         }
@@ -159,7 +158,7 @@ public class HttpServerHandler implements HttpHandler{
             if(scriptName.equals("/lightstatus.nes"))
             {
                 request.sendResponseHeaders(200, 0);
-                Byte status = 0;
+                Byte status;
                 try
                 {
                     status = this.sb.listener.lightStatus.get(byte_args.get("target_subnet")[0]).get(byte_args.get("target_id")[0]).get(byte_args.get("channel")[0]);
@@ -186,11 +185,13 @@ public class HttpServerHandler implements HttpHandler{
         {
             byte[] buffer = new byte[1024];
             int readedBytes;
-            DataInputStream dis = new DataInputStream(new FileInputStream(requestFile));
+            DataInputStream dis;
+            
+            dis = new DataInputStream(new FileInputStream(requestFile));
             while((readedBytes = dis.read(buffer)) != -1)
                 dos.write(buffer, 0, readedBytes);                
-                dis.close();
-            }    
+            dis.close();
+        }    
      }
         
 }

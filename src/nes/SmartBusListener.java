@@ -4,6 +4,7 @@
  */
 package nes;
 
+import nes.pkg.SmartBusHDLPackage;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -36,7 +37,7 @@ public class SmartBusListener extends Thread{
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 this.clientSocket.receive(receivePacket);
                 SmartBusHDLPackage pkg = new SmartBusHDLPackage().Build(receiveData, receivePacket.getLength());
-
+                
                 /*
                 System.out.println("[INFO] Package recieved from SmartBus network: ");
                 System.out.print("Operation:");
@@ -54,29 +55,52 @@ public class SmartBusListener extends Thread{
                 System.out.println();
                 /* **/
 
-                PackageLightSetAnswer pkgLighSetAnswer = new PackageLightSetAnswer(pkg);
-                if(pkgLighSetAnswer.isInstance())
+                if(((PackageLightSetAnswer)pkg).isInstance())
                 {
-                    System.out.println("[INFO] Light Status Recieved From SmartBus: [S:"+pkgLighSetAnswer.pkg.hdl_orig_subnet[0]+"ID: "+pkgLighSetAnswer.pkg.hdl_orig_id[0]+", CH: " + pkgLighSetAnswer.getChannel() + ", INT: " + pkgLighSetAnswer.getLightIntensity() + ", STAT: " + (pkgLighSetAnswer.getSuccessStatus()?"success":"error"));
-                    if(lightStatus.get(pkgLighSetAnswer.pkg.hdl_orig_subnet[0]) == null)
-                        lightStatus.put(pkgLighSetAnswer.pkg.hdl_orig_subnet[0], new HashMap());
-                    if(lightStatus.get(pkgLighSetAnswer.pkg.hdl_orig_subnet[0]).get(pkgLighSetAnswer.pkg.hdl_orig_id[0]) == null)
-                        lightStatus.get(pkgLighSetAnswer.pkg.hdl_orig_subnet[0]).put(pkgLighSetAnswer.pkg.hdl_orig_id[0], new HashMap());
-                    lightStatus.get(pkgLighSetAnswer.pkg.hdl_orig_subnet[0]).get(pkgLighSetAnswer.pkg.hdl_orig_id[0]).put(pkgLighSetAnswer.getChannel(),pkgLighSetAnswer.getLightIntensity());
+                    System.out.println(
+                            "[INFO] Light Status Recieved From SmartBus: [S:"
+                                    + pkg.hdl_orig_subnet[0]
+                                    +"ID: " + pkg.hdl_orig_id[0]
+                                    + ", CH: " + ((PackageLightSetAnswer)pkg).getChannel() 
+                                    + ", INT: " + ((PackageLightSetAnswer)pkg).getLightIntensity() 
+                                    + ", STAT: " + (((PackageLightSetAnswer)pkg).getSuccessStatus()?"success":"error"));
+                    
+                    if(lightStatus.get(pkg.hdl_orig_subnet[0]) == null){
+                        lightStatus.put(pkg.hdl_orig_subnet[0], new HashMap());
+                    }
+                    if(lightStatus.get(pkg.hdl_orig_subnet[0]).get(pkg.hdl_orig_id[0]) == null){
+                        lightStatus.get(pkg.hdl_orig_subnet[0]).put(pkg.hdl_orig_id[0], new HashMap());
+                    }
+                    
+                    lightStatus.get(pkg.hdl_orig_subnet[0]).get(pkg.hdl_orig_id[0]).put(
+                            ((PackageLightSetAnswer)pkg).getChannel(),
+                            ((PackageLightSetAnswer)pkg).getLightIntensity());
                 }
-                PackageLightStatusAnswer pkgLighStatusAnswer = new PackageLightStatusAnswer(pkg);
-                if(pkgLighStatusAnswer.isInstance())
+
+                if(((PackageLightStatusAnswer)pkg).isInstance())
                 {
                    System.out.println("[INFO] Batch Light Status Recieved From SmartBus");
-                   if(lightStatus.get(pkgLighStatusAnswer.pkg.hdl_orig_subnet[0]) == null)
-                    lightStatus.put(pkgLighStatusAnswer.pkg.hdl_orig_subnet[0], new HashMap());
-                   if(lightStatus.get(pkgLighStatusAnswer.pkg.hdl_orig_subnet[0]).get(pkgLighStatusAnswer.pkg.hdl_orig_id[0]) == null)
-                    lightStatus.get(pkgLighStatusAnswer.pkg.hdl_orig_subnet[0]).put(pkgLighStatusAnswer.pkg.hdl_orig_id[0], new HashMap());
+                   
+                   if(lightStatus.get(pkg.hdl_orig_subnet[0]) == null){
+                        lightStatus.put(pkg.hdl_orig_subnet[0], new HashMap());
+                   }
+                   if(lightStatus.get(pkg.hdl_orig_subnet[0]).get(pkg.hdl_orig_id[0]) == null){
+                        lightStatus.get(pkg.hdl_orig_subnet[0]).put(pkg.hdl_orig_id[0], new HashMap());
+                   }
 
-                    for(byte i=1; i<= pkgLighStatusAnswer.getChannelsQuantity(); i++)
+                    for(byte i = 1; i <= ((PackageLightStatusAnswer)pkg).getChannelsQuantity(); i++)
                     {
-                        System.out.println("[INFO] Light Status Recieved From SmartBus: [S:"+pkgLighStatusAnswer.pkg.hdl_orig_subnet[0]+"ID: "+pkgLighStatusAnswer.pkg.hdl_orig_id[0]+", CH: " + i + ", INT: " + pkgLighStatusAnswer.getChannelIntensity(i) + ", STAT: info");
-                        lightStatus.get(pkgLighStatusAnswer.pkg.hdl_orig_subnet[0]).get(pkgLighStatusAnswer.pkg.hdl_orig_id[0]).put(i,pkgLighStatusAnswer.getChannelIntensity(i));
+                        System.out.println(
+                                "[INFO] Light Status Recieved From SmartBus: [S:"
+                                        + pkg.hdl_orig_subnet[0]
+                                        +"ID: "+ pkg.hdl_orig_id[0]
+                                        + ", CH: " + i 
+                                        + ", INT: " + ((PackageLightStatusAnswer)pkg).getChannelIntensity(i) 
+                                        + ", STAT: info");
+                        
+                        lightStatus.get(pkg.hdl_orig_subnet[0]).get(pkg.hdl_orig_id[0]).put(
+                                i,
+                                ((PackageLightStatusAnswer)pkg).getChannelIntensity(i));
                     }
                  }
             } 
